@@ -4,6 +4,7 @@
 **/.terraform/
 **/.terraform/*
 **/.terraform.lock.hcl
+**/keys
 
 # Sensitive
 *.pem
