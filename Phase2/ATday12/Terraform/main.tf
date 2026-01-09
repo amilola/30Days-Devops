@@ -110,6 +110,13 @@ resource "google_compute_instance" "vm" {
     access_config {} # creates public IP
   }
 
+  metadata_startup_script = <<EOF
+#!/bin/bash
+echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu
+chmod 440 /etc/sudoers.d/ubuntu
+EOF
+
+
   metadata = {
     enable-oslogin = "FALSE"
     ssh-keys = <<EOF
@@ -117,5 +124,36 @@ ubuntu:${trimspace(file("${path.module}/keys/gcpkey.pub"))}
 EOF
   }
 
+}
+
+resource "null_resource" "ansiblebootstrap" {
+  depends_on = [
+    aws_instance.app_server,
+    google_compute_instance.vm
+    ]
+
+  provisioner "local-exec" {
+    command = <<EOT
+ANSIBLE_CONFIG=../ansible/ansible.cfg ../ansible/ansible-venv/bin/ansible-playbook \
+  -i ../ansible/inventory \
+  ../ansible/playbooks/bootstrap.yaml \
+  --extra-vars 'aws_ip=${aws_instance.app_server[0].public_ip} gcp_ip=${google_compute_instance.vm[0].network_interface[0].access_config[0].nat_ip}'
+EOT
+  }
+}
+
+resource "null_resource" "ansibleconfig" {
+  depends_on = [
+    null_resource.ansiblebootstrap
+  ]
+
+  provisioner "local-exec" {
+    command = <<EOT
+ANSIBLE_CONFIG=../ansible/ansible.cfg ../ansible/ansible-venv/bin/ansible-playbook \
+  -i ../ansible/inventory \
+  ../ansible/playbooks/server.yml \
+  --extra-vars 'aws_ip=${aws_instance.app_server[0].public_ip} gcp_ip=${google_compute_instance.vm[0].network_interface[0].access_config[0].nat_ip}'
+EOT
+  }
 }
 

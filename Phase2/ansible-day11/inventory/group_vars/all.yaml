@@ -1,0 +1,4 @@
+ansible_become: true
+
+repo_url: "https://github.com/amilola/30Days-Devops.git"
+repo_dest: "~/myapp"

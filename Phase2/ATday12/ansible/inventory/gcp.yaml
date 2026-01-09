@@ -1,0 +1,4 @@
+gcp:
+  hosts:
+    gcp-server-1:
+      ansible_host: "{{ gcp_ip }}"

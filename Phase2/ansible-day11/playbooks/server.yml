@@ -1,0 +1,7 @@
+---
+- name: Setup and Upgrade web servers
+  hosts: all
+  become: true
+
+  roles:
+    - common
