@@ -6,6 +6,7 @@
 **/.terraform.lock.hcl
 **/keys
 **/ansible-venv
+**/.tfvars
 
 # Sensitive
 *.pem
@@ -14,4 +15,4 @@
 # Archives
 *.zip
 *.tar.gz
-*.tgz
+*.tgzvault.pass

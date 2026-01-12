@@ -1,0 +1,17 @@
+---
+- name: Setup and Upgrade web servers
+  hosts: all
+  become: true
+
+  roles:
+   - common
+
+  tasks:
+    - name: Create application env file
+      ansible.builtin.copy:
+        dest: home/ubuntu/myapp/.env
+        content: |
+          DB_PASSWORD={{ app_db_password }}
+        owner: root
+        group: root
+        mode: "0600"

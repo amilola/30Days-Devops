@@ -1,0 +1,36 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Upgrade apt
+  ansible.builtin.apt:
+    upgrade: full
+
+
+- name: Install Required Packages
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - docker.io
+      - git
+    state: latest
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Ensure repo directory exists
+  ansible.builtin.file:
+    path: "{{ repo_dest }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Clone application repository
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ repo_dest }}"
+    update: yes
