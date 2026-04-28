@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "Phase3/taskflow-api/**"
+      - ".github/workflows/ci.yml"
   pull_request:
     paths:
       - "Phase3/taskflow-api/**"
