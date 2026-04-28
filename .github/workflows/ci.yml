@@ -47,7 +47,25 @@ jobs:
         run: |
           pytest
 
-      # Step 6: Build Docker image
+# NEW STEP: Login to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # NEW STEP: Extract commit SHA
+      - name: Set image tag
+        id: vars
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      # UPDATED: Build image with proper tag
       - name: Build Docker image
         run: |
-          docker build -t taskflow-api .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} .
+
+      # NEW STEP: Push image
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }}    
+      
