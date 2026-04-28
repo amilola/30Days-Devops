@@ -60,7 +60,7 @@ jobs:
         id: vars
         run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      # UPDATED: Build image with proper tagss
+      # UPDATED: Build image with proper tags
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} .
