@@ -8,5 +8,6 @@ def create_app():
     app.include_router(router)
     return app
 
+
 port = int(os.environ.get("PORT", 8000))
 app = create_app()
