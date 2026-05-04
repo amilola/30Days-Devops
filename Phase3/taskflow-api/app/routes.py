@@ -15,6 +15,7 @@ def health():
         raise Exception("Simulated failure")
     return {"status": "ok"}
 
+
 @router.get("/tasks")
 def get_tasks():
     return tasks
