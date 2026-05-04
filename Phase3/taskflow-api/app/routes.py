@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.models import Task
+import os
 
 
 router = APIRouter()
@@ -10,8 +11,9 @@ id_counter = 1
 
 @router.get("/health")
 def health():
-    raise Exception("Simulated failure")
-
+    if os.getenv("FAIL_HEALTH") == "true":
+        raise Exception("Simulated failure")
+    return {"status": "ok"}
 
 @router.get("/tasks")
 def get_tasks():

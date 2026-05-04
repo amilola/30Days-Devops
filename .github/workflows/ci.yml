@@ -13,7 +13,7 @@ on:
       - "Phase3/taskflow-api/**"
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     # All commands run inside Phase3/taskflow-api
@@ -86,14 +86,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Get current revision
-        id: prev
-        run: |
-          PREV=$(gcloud run services describe taskflow-api \
-            --region=us-central1 \
-            --format='value(status.traffic[0].revisionName)')
-          echo "PREV_REV=$PREV" >> $GITHUB_OUTPUT
-
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy taskflow-api \
@@ -101,6 +93,7 @@ jobs:
             --platform=managed \
             --region=us-central1 \
             --allow-unauthenticated \
+            --set-env-vars=FAIL_HEALTH=true \
             --min-instances=0
 
       - name: Get Cloud Run URL
@@ -112,12 +105,23 @@ jobs:
           echo "URL=$URL" >> $GITHUB_OUTPUT
 
       - name: Health check
+        id: health
         run: |
           curl -f ${{ steps.get_url.outputs.URL }}/health
 
       - name: Rollback if failed
-        if: failure()
+        if: steps.health.outcome == 'failure'
         run: |
+          echo "Health check failed. Rolling back..."
+
+          PREV=$(gcloud run revisions list \
+            --service=taskflow-api \
+            --region=us-central1 \
+            --limit=2 \
+            --format="value(metadata.name)" | tail -n 1)
+
+          echo "Rolling back to: $PREV"
+
           gcloud run services update-traffic taskflow-api \
             --region=us-central1 \
-            --to-revisions=${{ steps.prev.outputs.PREV_REV }}=100
+            --to-revisions=$PREV=100
