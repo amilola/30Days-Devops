@@ -10,7 +10,7 @@ id_counter = 1
 
 @router.get("/health")
 def health():
-    return {"status": "ok"}
+    raise Exception("Simulated failure")
 
 
 @router.get("/tasks")
