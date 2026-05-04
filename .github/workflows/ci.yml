@@ -78,20 +78,19 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }}  
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:latest  
       
-      - name: Deploy to VM
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
-            docker pull damioya/taskflow-api:latest
-            docker stop taskflow || true
-            docker rm taskflow || true
-            docker run -d \
-              -p 8000:8000 \
-              -e ENV=production \
-              --name taskflow \
-              damioya/taskflow-api:latest
-            
-            
+          credentials_json: ${{ secrets.GCP_SA_KEY }}    
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy taskflow-api \
+            --image=${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:latest \
+            --platform=managed \
+            --region=us-central1 \
+            --allow-unauthenticated \
+            --min-instances=0
