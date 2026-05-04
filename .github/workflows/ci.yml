@@ -107,10 +107,15 @@ jobs:
       - name: Health check
         id: health
         run: |
-          curl -f ${{ steps.get_url.outputs.URL }}/health
+          if curl -f ${{ steps.get_url.outputs.URL }}/health; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
       - name: Rollback if failed
-        if: steps.health.outcome == 'failure'
+        if: steps.health.outputs.status == 'failure'
         run: |
           echo "Health check failed. Rolling back..."
 
