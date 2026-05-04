@@ -93,7 +93,6 @@ jobs:
             --platform=managed \
             --region=us-central1 \
             --allow-unauthenticated \
-            --set-env-vars=FAIL_HEALTH=true \
             --min-instances=0
 
       - name: Get Cloud Run URL
