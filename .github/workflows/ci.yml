@@ -86,6 +86,14 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Get current revision
+        id: prev
+        run: |
+          PREV=$(gcloud run services describe taskflow-api \
+            --region=us-central1 \
+            --format='value(status.traffic[0].revisionName)')
+          echo "PREV_REV=$PREV" >> $GITHUB_OUTPUT
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy taskflow-api \
@@ -94,3 +102,22 @@ jobs:
             --region=us-central1 \
             --allow-unauthenticated \
             --min-instances=0
+
+      - name: Get Cloud Run URL
+        id: get_url
+        run: |
+          URL=$(gcloud run services describe taskflow-api \
+            --region=us-central1 \
+            --format='value(status.url)')
+          echo "URL=$URL" >> $GITHUB_OUTPUT
+
+      - name: Health check
+        run: |
+          curl -f ${{ steps.get_url.outputs.URL }}/health
+
+      - name: Rollback if failed
+        if: failure()
+        run: |
+          gcloud run services update-traffic taskflow-api \
+            --region=us-central1 \
+            --to-revisions=${{ steps.prev.outputs.PREV_REV }}=100
