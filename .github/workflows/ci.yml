@@ -107,9 +107,9 @@ jobs:
         id: health
         run: |
           if curl -f -H "x-fail-health: ${{ vars.FAIL_HEALTH }}" ${{ steps.get_url.outputs.URL }}/health; then
-            echo "status=failure" >> $GITHUB_OUTPUT
-          else
             echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
             exit 0
           fi
 
