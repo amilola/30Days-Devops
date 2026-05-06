@@ -93,6 +93,7 @@ jobs:
             --platform=managed \
             --region=us-central1 \
             --allow-unauthenticated \
+            --clear-env-vars \
             --min-instances=0
 
       - name: Get Cloud Run URL
