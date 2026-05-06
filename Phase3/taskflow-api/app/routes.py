@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from app.models import Task
 
 
@@ -9,9 +9,9 @@ id_counter = 1
 
 
 @router.get("/health")
-def health():
-    if True:
-        raise Exception("Simulated failure")
+def health(request: Request):
+    if request.headers.get("x-fail-health") == "true":
+        raise Exception("Simulated runtime failure")
     return {"status": "ok"}
 
 
