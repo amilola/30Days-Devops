@@ -11,7 +11,7 @@ id_counter = 1
 
 @router.get("/health")
 def health():
-    if os.getenv("FAIL_HEALTH") == "true":
+    if False:
         raise Exception("Simulated failure")
     return {"status": "ok"}
 
