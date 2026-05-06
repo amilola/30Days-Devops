@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from app.models import Task
 
 
-
 router = APIRouter()
 
 tasks = []
