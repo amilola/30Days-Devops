@@ -27,3 +27,11 @@ def create_task(task: Task):
     tasks.append(new_task)
     id_counter += 1
     return new_task
+
+
+@router.get("/")
+def root():
+    return {
+        "environment": "blue",
+        "version": "v1"
+    }

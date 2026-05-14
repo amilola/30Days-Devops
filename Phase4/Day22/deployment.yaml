@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: taskflow
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: taskflow
+
+  template:
+    metadata:
+      labels:
+        app: taskflow
+
+    spec:
+      containers:
+      - name: taskflow-api
+        image: damioya/taskflow-api:latest
+
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 8000

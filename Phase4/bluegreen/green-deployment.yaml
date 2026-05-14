@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskflow-green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taskflow
+      version: green
+  template:
+    metadata:
+      labels:
+        app: taskflow
+        version: green
+    spec:
+      containers:
+      - name: taskflow
+        image: damioya/taskflow-api:latest
+        ports:
+        - containerPort: 8000

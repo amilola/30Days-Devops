@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: taskflow-ingress
+
+spec:
+  rules:
+  - host: demo.local
+
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+
+        backend:
+          service:
+            name: taskflow-api-service
+            port:
+              number: 80
