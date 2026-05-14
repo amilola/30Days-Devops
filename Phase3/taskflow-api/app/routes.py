@@ -32,6 +32,6 @@ def create_task(task: Task):
 @router.get("/")
 def root():
     return {
-        "environment": "blue",
-        "version": "v1"
+        "environment": "green",
+        "version": "v2"
     }
