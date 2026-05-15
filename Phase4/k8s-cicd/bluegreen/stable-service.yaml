@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: taskflow-stable-service
+  namespace: taskflow
 spec:
   type: ClusterIP
   selector:
-    app: taskflow
-    version: green
+    app: taskflows
+    version: blue
   ports:
   - port: 80
     targetPort: 8000

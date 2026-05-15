@@ -1,0 +1,51 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Phase4/k8s-cicd/**"
+      - ".github/workflows/deploy.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+# NEW STEP: Extract commit SHA
+    - name: Set image tag
+      id: vars
+      run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} .
+        docker tag ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:v1
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }}  
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:v1 
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Configure kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f bluegreen/
+        kubectl rollout restart deployment/taskflow-blue -n taskflow
