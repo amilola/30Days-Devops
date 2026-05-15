@@ -29,7 +29,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} .
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} ./taskflow-api
         docker tag ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ steps.vars.outputs.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:v1
 
     - name: Push Docker image
